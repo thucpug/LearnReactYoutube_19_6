@@ -17,8 +17,15 @@ class TaskForm extends Component {
       [name]: value
     });
   };
+  componentWillMount() {
+    console.log(this.props.task);
+    this.setState({
+      name: this.props.task.name,
+      status: this.props.task.status
+    });
+  }
+
   onAddTask = () => {
-    console.log(typeof this.state.name);
     if (this.state.name != '') {
       this.props.onAddTask(this.state);
       this.onClearForm();

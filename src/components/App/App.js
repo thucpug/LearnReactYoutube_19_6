@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import TaskForm from '../TaskForm/TaskForm';
 import Controlls from '../Controlls/Controlls';
 import TaskList from '../TaskList/TaskList';
+import { validate } from '@babel/types';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       tasks: [],
+      editTask: Object,
       isDisplayForm: false
     };
   }
@@ -46,12 +48,54 @@ class App extends Component {
     this.setState({ isDisplayForm: check });
   };
   onAddTask = data => {
-    data.id = 4;
+    console.log(data);
+    data.id = Math.floor(Math.random() * 100);
     var { tasks } = this.state;
     tasks.push(data);
     this.setState({ tasks: tasks });
     localStorage.setItem('data', JSON.stringify(this.state.tasks));
     console.log(this.state);
+  };
+  onUpdateStatus = data => {
+    var { tasks } = this.state;
+    for (const item of tasks) {
+      if (item.id === data) {
+        item.status = !item.status;
+      }
+    }
+    this.setState({
+      tasks: tasks
+    });
+    localStorage.setItem('data', JSON.stringify(this.state.tasks));
+  };
+  onDelete = data => {
+    var { tasks } = this.state;
+    tasks.forEach((value, index) => {
+      if (value.id === data) {
+        tasks.splice(value, 1);
+      }
+    });
+    this.setState({
+      tasks: tasks
+    });
+    localStorage.setItem('data', JSON.stringify(this.state.tasks));
+  };
+  onEdit = data => {
+    this.onShowForm();
+    var { tasks } = this.state;
+    for (const task of tasks) {
+      if (task.id == data) {
+        var editItem = task;
+        console.log(editItem);
+        this.setState({
+          editTask: editItem
+        });
+      }
+    }
+    console.log(this.state.editTask);
+  };
+  onShowForm = () => {
+    this.setState({ isDisplayForm: true });
   };
   onCloseForm = () => {
     this.setState({ isDisplayForm: !this.state.isDisplayForm });
@@ -59,7 +103,11 @@ class App extends Component {
   render() {
     var { tasks, isDisplayForm } = this.state;
     var toggleFormAdd = isDisplayForm ? (
-      <TaskForm onAddTask={this.onAddTask} onClose={() => this.onCloseForm()} />
+      <TaskForm
+        onAddTask={this.onAddTask}
+        onClose={() => this.onCloseForm()}
+        task={this.state.editTask}
+      />
     ) : (
       ''
     );
@@ -116,7 +164,12 @@ class App extends Component {
                   <Controlls />
                 </div>
                 <div className="row mt-15">
-                  <TaskList tasks={tasks} />
+                  <TaskList
+                    tasks={tasks}
+                    onUpdateStatus={this.onUpdateStatus}
+                    onDelete={this.onDelete}
+                    onEdit={this.onEdit}
+                  />
                 </div>
               </div>
             </div>

@@ -4,7 +4,15 @@ import TaskItem from './TaskItem';
 class TaskList extends Component {
   render() {
     var mapTaskItem = this.props.tasks.map((val, index) => {
-      return <TaskItem key={val.id} task={val} />;
+      return (
+        <TaskItem
+          key={val.id}
+          task={val}
+          onUpdateStatus={this.props.onUpdateStatus}
+          onDelete={this.props.onDelete}
+          onEdit = {this.props.onEdit}
+        />
+      );
     });
     return (
       <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
