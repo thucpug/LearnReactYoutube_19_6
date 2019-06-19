@@ -3,6 +3,9 @@ import TaskItem from './TaskItem';
 
 class TaskList extends Component {
   render() {
+    var mapTaskItem = this.props.tasks.map((val, index) => {
+      return <TaskItem key={val.id} task={val} />;
+    });
     return (
       <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
         <table className="table table-bordered table-hover">
@@ -29,8 +32,8 @@ class TaskList extends Component {
               </td>
               <td />
             </tr>
-            <TaskItem />
-            <TaskItem />
+
+            {mapTaskItem}
           </tbody>
         </table>
       </div>
