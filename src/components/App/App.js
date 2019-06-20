@@ -201,7 +201,7 @@ class App extends Component {
                   className="btn btn-danger"
                   onClick={e => this.onremovelocalstorage(e)}
                 >
-                  <span className="fa fa-plus mr-5 mt-5" />
+                  <span className="fa fa-plus mr-5" />
                   Remove localstorage
                 </button>
                 <div className="row mt-15">
