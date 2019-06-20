@@ -5,6 +5,7 @@ class TaskForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: null,
       name: '',
       status: false
     };
@@ -18,18 +19,40 @@ class TaskForm extends Component {
     });
   };
   componentWillMount() {
-    console.log(this.props.task);
-    this.setState({
-      name: this.props.task.name,
-      status: this.props.task.status
-    });
+    console.log(this.props.editTask);
+    if (this.props.editTask !== null) {
+      this.setState({
+        id: this.props.editTask.id,
+        name: this.props.editTask.name,
+        status: this.props.editTask.status
+      });
+    }
+  }
+  componentWillReceiveProps(nextprops) {
+    console.log(nextprops);
+    if (nextprops.editTask && nextprops) {
+      this.setState({
+        id: nextprops.editTask.id,
+        name: nextprops.editTask.name,
+        status: nextprops.editTask.status
+      });
+    }
   }
 
   onAddTask = () => {
     if (this.state.name != '') {
-      this.props.onAddTask(this.state);
-      this.onClearForm();
-      this.onCloseForm();
+      if (this.props.editTask && this.props.editTask.id != null) {
+        this.props.editTask.name = this.state.name;
+        this.props.editTask.status = this.state.status;
+        console.log(this.props.editTask);
+        this.props.onAddTask(this.props.editTask);
+        this.onClearForm();
+      } else {
+        this.props.onAddTask(this.state);
+        console.log(this.state);
+        this.onClearForm();
+        this.onCloseForm();
+      }
     }
   };
   onClearForm = () => {
@@ -42,10 +65,15 @@ class TaskForm extends Component {
     this.props.onClose();
   };
   render() {
+    var { id } = this.state;
+    console.log(id);
+
     return (
       <div className="panel panel-warning">
         <div className="panel-heading">
-          <h3 className="panel-title">Thêm Công Việc</h3>
+          <h3 className="panel-title">
+            {id != null ? 'Cập Nhật Công Việc' : 'Thêm Công Việc'}
+          </h3>
         </div>
         <div className="panel-body">
           <form>
@@ -63,6 +91,7 @@ class TaskForm extends Component {
             <select
               className="form-control"
               required="required"
+              name="status"
               defaultValue={this.state.status}
               onChange={e => this.onChange(e)}
             >
@@ -76,7 +105,7 @@ class TaskForm extends Component {
                 className="btn btn-warning"
                 onClick={() => this.onAddTask()}
               >
-                Thêm
+                {id != null ? 'Lưu Lại' : 'Thêm'}
               </button>
               &nbsp;
               <button

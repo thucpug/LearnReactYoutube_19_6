@@ -8,6 +8,7 @@ class TaskItem extends Component {
     this.props.onDelete(this.props.task.id);
   };
   onEdit =()=>{
+    console.log(this.props.task.id);
     this.props.onEdit(this.props.task.id);
   }
   render() {

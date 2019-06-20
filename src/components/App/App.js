@@ -9,8 +9,12 @@ class App extends Component {
     super(props);
     this.state = {
       tasks: [],
-      editTask: Object,
-      isDisplayForm: false
+      editTask: null,
+      isDisplayForm: false,
+      filter: {
+        name: '',
+        status: -1
+      }
     };
   }
   componentWillMount() {
@@ -46,15 +50,29 @@ class App extends Component {
   onAddTaskForm = e => {
     var check = !this.state.isDisplayForm;
     this.setState({ isDisplayForm: check });
+    this.setState({
+      editTask: null
+    });
   };
   onAddTask = data => {
     console.log(data);
-    data.id = Math.floor(Math.random() * 100);
     var { tasks } = this.state;
-    tasks.push(data);
-    this.setState({ tasks: tasks });
-    localStorage.setItem('data', JSON.stringify(this.state.tasks));
-    console.log(this.state);
+    if (data.id !== null) {
+      tasks.forEach((val, index) => {
+        if (val.id === data.id) {
+          tasks[index] = data;
+        }
+        this.setState({ tasks: tasks });
+        localStorage.setItem('data', JSON.stringify(this.state.tasks));
+        console.log(this.state);
+      });
+    } else {
+      data.id = Math.floor(Math.random() * 100);
+      tasks.push(data);
+      this.setState({ tasks: tasks });
+      localStorage.setItem('data', JSON.stringify(this.state.tasks));
+      console.log(this.state);
+    }
   };
   onUpdateStatus = data => {
     var { tasks } = this.state;
@@ -69,10 +87,12 @@ class App extends Component {
     localStorage.setItem('data', JSON.stringify(this.state.tasks));
   };
   onDelete = data => {
+    console.log(data);
+
     var { tasks } = this.state;
     tasks.forEach((value, index) => {
       if (value.id === data) {
-        tasks.splice(value, 1);
+        tasks.splice(index, 1);
       }
     });
     this.setState({
@@ -81,6 +101,7 @@ class App extends Component {
     localStorage.setItem('data', JSON.stringify(this.state.tasks));
   };
   onEdit = data => {
+    console.log(data);
     this.onShowForm();
     var { tasks } = this.state;
     for (const task of tasks) {
@@ -88,11 +109,19 @@ class App extends Component {
         var editItem = task;
         console.log(editItem);
         this.setState({
-          editTask: editItem
+          editTask: task
         });
       }
     }
     console.log(this.state.editTask);
+  };
+  onFilter = (filterName, filterStatus) => {
+    this.setState({
+      filter: {
+        name: filterName,
+        status: parseInt(filterStatus)
+      }
+    });
   };
   onShowForm = () => {
     this.setState({ isDisplayForm: true });
@@ -101,12 +130,27 @@ class App extends Component {
     this.setState({ isDisplayForm: !this.state.isDisplayForm });
   };
   render() {
-    var { tasks, isDisplayForm } = this.state;
+    var { tasks, isDisplayForm, filter } = this.state;
+    if (filter) {
+      if (filter.name) {
+        tasks = tasks.filter(task => {
+          return task.name.toLowerCase().indexOf(filter.name) !== -1;
+        });
+      }
+      tasks = tasks.filter(task => {
+        if (filter.status === -1) {
+          return tasks;
+        } else {
+          return task.status === (filter.status === 1 ? true : false);
+        }
+      });
+    }
+
     var toggleFormAdd = isDisplayForm ? (
       <TaskForm
         onAddTask={this.onAddTask}
         onClose={() => this.onCloseForm()}
-        task={this.state.editTask}
+        editTask={this.state.editTask}
       />
     ) : (
       ''
@@ -169,6 +213,7 @@ class App extends Component {
                     onUpdateStatus={this.onUpdateStatus}
                     onDelete={this.onDelete}
                     onEdit={this.onEdit}
+                    onFilter={this.onFilter}
                   />
                 </div>
               </div>
